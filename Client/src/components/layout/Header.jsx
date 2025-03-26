@@ -1,39 +1,56 @@
 import {
   AppBar,
+  Backdrop,
   Box,
   IconButton,
   Toolbar,
   Tooltip,
   Typography,
 } from '@mui/material'
-import React from 'react'
+import React, { lazy, Suspense, useState } from 'react'
 import { orange } from '../../Constants/color'
 import {
   Add as AddIcon,
   Menu as MenuIcon,
   Search as SearchIcon,
   Group as GroupIcon,
+  Logout as LogoutIcon,
+  Notifications as NotificationsIcon,
 } from '@mui/icons-material'
-import useNavigate from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+
+const Search = lazy(() => import('../specific/Search'))
+const Noticications = lazy(() => import('../specific/Noticications'))
+const NewGroups = lazy(() => import('../specific/NewGroups'))
 
 const Header = () => {
+  const [isMoblie, setisMoblie] = useState(false)
+  const [isSearch, setSearch] = useState(false)
+  const [isNewgroup, setisNewgroup] = useState(false)
+  const [isNotification, setisNotification] = useState(false)
+
   const navigate = useNavigate()
 
   const handleMobile = () => {
-    console.log('handleMobile')
+    setisMoblie((prev) => !prev)
   }
 
   const openSeacrhHandle = () => {
-    console.log('openSeacrhHandle')
+    setSearch((prev) => !prev)
   }
 
   const openNewGroup = () => {
-    console.log('openNewGroup')
-  }
-  const NavigateToGroup = () => {
-    console.log('NavigateToGroup')
+    setisNewgroup((prev) => !prev)
   }
 
+  const openNotification = () => {
+    setisNotification((prev) => !prev)
+  }
+  const NavigateToGroup = () => navigate('/Groups')
+
+  const LogoutHandler = () => {
+    console.log('LogoutHandler')
+  }
   return (
     <>
       <Box sx={{ flexGrow: 1 }} height={'4rem'}>
@@ -52,35 +69,62 @@ const Header = () => {
             </Box>
             <Box sx={{ flexGrow: 1 }} />
             <Box>
-              <Tooltip title="Search">
-                <IconButton
-                  color="inherit"
-                  size="large"
-                  onClick={openSeacrhHandle}
-                >
-                  <SearchIcon />
-                </IconButton>
-              </Tooltip>
+              <IconBtn
+                title={'Search'}
+                icon={<SearchIcon />}
+                onClick={openSeacrhHandle}
+              />
 
-              <Tooltip title="New Group">
-                <IconButton color="inherit" size="large" onClick={openNewGroup}>
-                  <AddIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Manage Groups">
-                <IconButton
-                  color="inherit"
-                  size="large"
-                  onClick={NavigateToGroup}
-                >
-                  <GroupIcon />
-                </IconButton>
-              </Tooltip>
+              <IconBtn
+                title={'New Group'}
+                icon={<AddIcon />}
+                onClick={openNewGroup}
+              />
+              <IconBtn
+                title={'Manage Groups'}
+                icon={<GroupIcon />}
+                onClick={NavigateToGroup}
+              />
+
+              <IconBtn
+                title={'Notifications'}
+                icon={<NotificationsIcon />}
+                onClick={openNotification}
+              />
+              <IconBtn
+                title={'Logout'}
+                icon={<LogoutIcon />}
+                onClick={LogoutHandler}
+              />
             </Box>
           </Toolbar>
         </AppBar>
       </Box>
+      {isSearch && (
+        <Suspense fallback={<Backdrop open />}>
+          <Search />
+        </Suspense>
+      )}
+      {isNotification && (
+        <Suspense fallback={<Backdrop open />}>
+          <Noticications />
+        </Suspense>
+      )}
+      {isNewgroup && (
+        <Suspense fallback={<Backdrop open />}>
+          <NewGroups />
+        </Suspense>
+      )}
     </>
+  )
+}
+const IconBtn = ({ title, icon, onClick }) => {
+  return (
+    <Tooltip title={title}>
+      <IconButton color="inherit" size="large" onClick={onClick}>
+        {icon}
+      </IconButton>
+    </Tooltip>
   )
 }
 
